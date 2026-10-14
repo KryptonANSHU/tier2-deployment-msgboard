@@ -1,0 +1,26 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: krypton
+      POSTGRES_PASSWORD: msgboard_pass
+      POSTGRES_DB: tier2_msgboard_db
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U krypton -d tier2_msgboard_db"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  app:
+    image: kryptonanshu/msgboard-app:latest
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: krypton
+      DB_PASSWORD: msgboard_pass
+      DB_NAME: tier2_msgboard_db
+    ports:
+      - "3000:3000"
+    depends_on:
+      db:
+        condition: service_healthy
