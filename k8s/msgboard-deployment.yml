@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: msgboard
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: msgboard
+  template:
+    metadata:
+      labels:
+        app: msgboard
+    spec:
+      containers:
+        - name: msgboard
+          image: kryptonanshu/msgboard-app:latest
+          ports:
+            - containerPort: 3000
+          envFrom:
+            - configMapRef:
+                name: msgboard-config
+            - secretRef:
+                name: msgboard-secret
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 5
+            periodSeconds: 10
